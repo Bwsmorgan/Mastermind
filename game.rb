@@ -1,33 +1,26 @@
 class Game
 
-
     attr_accessor :code
     @@LIST_OF_COLOURS = ['R','B','G','Y','P','O']
     
     def initialize (code = nil)
-
         @code = code == nil ? computer_generated_code : code
-
     end
 
-
     def computer_generated_code
-
         #using rand function with an inclusive range select 4 random integers from 0 to 5 representing each of the indexes in LIST_OF_COLOURS place them into an array and turn that array into a string representing our computer generated code
         random_code = []
-        4.times {random_code << @@LIST_OF_COLOURS[rand(0..5)] }
+        4.times { random_code << @@LIST_OF_COLOURS[rand(0..5)] }
         random_code = random_code.join
-        random_code
+        # puts"This is the computers random guess: #{random_code}"
+        random_code  
     end
 
     def check_code(code_guess)
         
         correct_position_count = 0 
-
         for i in 0...code_guess.length do
-
-            correct_position?(code_guess[i],i) ? correct_position_count+=1 : correct_position_count+=0
-            
+            correct_position?(code_guess[i],i) ? correct_position_count+=1 : correct_position_count+=0  
         end
 
         if correct_position_count == 4 
@@ -35,13 +28,69 @@ class Game
         else
             puts "#{correct_position_count} of your values are in the correct position"
         end
-
     end
 
     def correct_position?(value, index)
-
         code[index] == value ? true : false
     end
+
+    # returns the correct indexes
+    def check_computer_guess(code_guess)
+
+        # puts code_guess
+        positions = []
+
+        for i in 0...code_guess.length
+            if code_guess[i] == code[i]
+                positions << i+1
+            end 
+        end
+        # puts"positions: #{positions}"
+        computer_matches(positions,code_guess)
+    end
+
+
+    def computer_matches(match_list,guess)
+
+        if match_list == []
+            puts "None of the computer's picks are correct"
+            computers_next_guess(match_list,guess)
+
+        elsif match_list.length == 4
+
+            puts "Computer solved the code!"
+            new_game?
+        else
+            puts "\nThe following pick(s) are in the correct position: " +
+            "#{match_list.join(', ')}"
+            computers_next_guess(match_list,guess)
+        end
+    end
+
+
+    def computers_next_guess(list_of_matches, computers_code)
+
+        # puts "#{@code}"
+        # puts "#{list_of_matches}"
+        # puts "#{computers_code}"
+        
+        new_code = []
+        for x in 0...4
+            if list_of_matches.include?(x+1)
+                # puts "#{x+1} is in list_of_matches"
+                new_code << computers_code[x]
+            else
+                # puts "#{x+1} is not in list_of_matches"
+                new_code << ['R','B','G','Y','O','P'].sample
+            end
+            # puts "#{new_code}"
+        end
+        puts "/n#{new_code.join}"
+
+        new_code.join
+                    
+    end
+
 
 
     def game_over(a)
@@ -70,16 +119,7 @@ class Game
 
     end
 
-
 end
-
-#welcome to the game 
-#do you want to solve a code or set a code for the computer to solve? s 
-#if player says solve 
-# enter 4 letters representing any of the 6 options R-red Y-Yellow B-blue G-green P-purple O-orange
-#then rnadom generator will create color selection on its own
-
-
 
 
 class Play
@@ -102,10 +142,24 @@ class Play
 
             puts "\nYou have chosen to be the codemaker. Please enter a 4 digit code using any of the following characters representing a colour"
             puts "\nR - Red, B - Blue, G - Green, Y - Yellow, P - Purple, O - Orange"
-            game_code = gets.chomp
 
+            game_code = gets.chomp+"\n"
             game = Game.new(game_code)
-            puts game.code
+
+            guess_count = 1
+            computer_guess = game.computer_generated_code
+
+            # while guess_count != 13
+
+                puts "\nComputer guess ##{guess_count}: #{computer_guess}"
+
+                xyz = game.check_computer_guess(computer_guess)
+                computer_guess = xyz
+                puts "\n#{computer_guess}"
+                # guess_count+=1    
+            # end
+            
+            # game.game_over(false)
 
         elsif player_entry == 'g'
 
@@ -114,7 +168,6 @@ class Play
             puts "\nR - Red, B - Blue, G - Green, Y - Yellow, P - Purple, O - Orange"
 
             game = Game.new
-            puts game.code
 
             guess_count = 1
 
