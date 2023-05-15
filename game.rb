@@ -5,22 +5,23 @@ class Game
     
     def initialize (code = nil)
 
-        # If the game is initialized without an argument game_status secret code will be created by the random_code_generator. 
+        # If the game is initialized without an argument game_status secret code will be created by the generate_random_code. 
 
         #This functionality allows the user to play the game as either the codemaker, in which case our constructer will take an argument/code from the user, or as the one solving the code, in which case the code will be randomly generated
-        @code = code == nil ? random_code_generator : code
+        @code = code == nil ? generate_random_code : code
     end
 
-    def random_code_generator
+    def generate_random_code
 
         random_code = []
+        #The following uses the times method to execute the block 4 times. Each time the block is executed it produces a random number from 0 to 4 which corresponds to an index in the list of colours which is then added to the random code list
         4.times { random_code << @@LIST_OF_COLOURS[rand(0..5)] }
         random_code = random_code.join
         random_code  
     end
 
-
-    def human_code_checker(code_entry)
+    
+    def check_code(code_entry)
         
         correct_position_count = 0 
         for i in 0...code_entry.length do
@@ -34,16 +35,14 @@ class Game
         end
     end
 
+
     def correct_position?(index_value, index)
         code[index] == index_value ? true : false
     end
 
 
-
-
-    # returns the correct indexes
-    def computer_code_checker(code_entry)
-
+    def check_computer_code(code_entry)
+        # The list of matching indexes is used to give the computer a hint as to which code positions are correct and which are wrong
         matching_indexes = []
 
         for i in 0...code_entry.length
@@ -51,27 +50,27 @@ class Game
                 matching_indexes << i+1
             end 
         end
-        computer_matches(matching_indexes,code_entry)
+        check_for_matches(matching_indexes,code_entry)
     end
 
 
-    def computer_matches(list_of_index_matches,code_entry)
+    def check_for_matches(list_of_index_matches,code_entry)
 
         if list_of_index_matches == []
             puts "\nNone of the computer's picks are correct"
-            computer_code_generator(list_of_index_matches,code_entry)
+            generate_random_computer_code(list_of_index_matches,code_entry)
         elsif list_of_index_matches.length == 4
             puts "\nThe computer solved the code!"
-            new_game?
+            start_new_game
         else
             puts "\nThe following pick(s) are in the correct position: " +
             "#{list_of_index_matches.join(', ')}"
-            computer_code_generator(list_of_index_matches,code_entry)
+            generate_random_computer_code(list_of_index_matches,code_entry)
         end
     end
 
 
-    def computer_code_generator(code_index_matches, current_computer_code)
+    def generate_random_computer_code(code_index_matches, current_computer_code)
 
         new_code = []
         for x in 0...4
@@ -89,22 +88,22 @@ class Game
 
         if game_status
             puts "\nCONGRATULATIONS YOU GUESSED THE CORRECT CODE! YOU WIN!"
-            new_game?
+            start_new_game
         else
             puts "\nNice try but the code is #{code} :(. Better luck next time"
-            new_game?
+            start_new_game
         end
     end
 
 
-    def new_game?
+    def start_new_game
 
         puts "\nWould you like to play again?(y/n)"
         play_again = gets.chomp
 
         if play_again == 'y'
-            new_game = Play.new()
-            new_game.play
+            start_new_game = Play.new()
+            start_new_game.play
         elsif play_again == 'n'
             puts "\nThanks for playing!"
             exit
@@ -139,12 +138,12 @@ class Play
             computer_game = Game.new(game_code)
 
             guess_count = 1
-            computer_guess = computer_game.random_code_generator
+            computer_guess = computer_game.generate_random_code
 
             while guess_count != 13
                 
                 puts "\nComputer code_entry ##{guess_count}: #{computer_guess}"
-                current_guess = computer_game.computer_code_checker(computer_guess)
+                current_guess = computer_game.check_computer_code(computer_guess)
                 computer_guess = current_guess
                 
                 puts "AHHH"
@@ -167,7 +166,7 @@ class Play
 
                 puts "\n#{guess_count}. Please enter your code guess:"
                 player_guess = gets.chomp
-                game.human_code_checker(player_guess)
+                game.check_code(player_guess)
                 guess_count += 1
             end
 
@@ -183,4 +182,3 @@ end
 
 game = Play.new()
 game.play
-
