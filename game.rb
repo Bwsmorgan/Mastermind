@@ -42,7 +42,7 @@ class Game
 
 
     def check_computer_code(code_entry)
-        # The list of matching indexes is used to give the computer a hint as to which code positions are correct and which are wrong
+        # The list of matching indexes is used to give the computer a hint as to which code positions are correct and which are incorrect
         matching_indexes = []
 
         for i in 0...code_entry.length
@@ -74,6 +74,7 @@ class Game
 
         new_code = []
         for x in 0...4
+            # We increment x by one because the values in the code_index_matches represent the postion of the each colour which is from 1 to 4 
             if code_index_matches.include?(x+1)
                 new_code << current_computer_code[x]
             else
