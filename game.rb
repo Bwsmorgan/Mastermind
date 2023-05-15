@@ -4,23 +4,27 @@ class Game
     @@LIST_OF_COLOURS = ['R','B','G','Y','P','O']
     
     def initialize (code = nil)
-        @code = code == nil ? computer_generated_code : code
+
+        # If the game is initialized without an argument game_status secret code will be created by the random_code_generator. 
+
+        #This functionality allows the user to play the game as either the codemaker, in which case our constructer will take an argument/code from the user, or as the one solving the code, in which case the code will be randomly generated
+        @code = code == nil ? random_code_generator : code
     end
 
-    def computer_generated_code
-        #using rand function with an inclusive range select 4 random integers from 0 to 5 representing each of the indexes in LIST_OF_COLOURS place them into an array and turn that array into a string representing our computer generated code
+    def random_code_generator
+
         random_code = []
         4.times { random_code << @@LIST_OF_COLOURS[rand(0..5)] }
         random_code = random_code.join
-        # puts"This is the computers random guess: #{random_code}"
         random_code  
     end
 
-    def check_code(code_guess)
+
+    def human_code_checker(code_entry)
         
         correct_position_count = 0 
-        for i in 0...code_guess.length do
-            correct_position?(code_guess[i],i) ? correct_position_count+=1 : correct_position_count+=0  
+        for i in 0...code_entry.length do
+            correct_position?(code_entry[i],i) ? correct_position_count+=1 : correct_position_count+=0  
         end
 
         if correct_position_count == 4 
@@ -30,76 +34,64 @@ class Game
         end
     end
 
-    def correct_position?(value, index)
-        code[index] == value ? true : false
+    def correct_position?(index_value, index)
+        code[index] == index_value ? true : false
     end
+
+
+
 
     # returns the correct indexes
-    def check_computer_guess(code_guess)
+    def computer_code_checker(code_entry)
 
-        # puts code_guess
-        positions = []
+        matching_indexes = []
 
-        for i in 0...code_guess.length
-            if code_guess[i] == code[i]
-                positions << i+1
+        for i in 0...code_entry.length
+            if code_entry[i] == code[i]
+                matching_indexes << i+1
             end 
         end
-        # puts"positions: #{positions}"
-        computer_matches(positions,code_guess)
+        computer_matches(matching_indexes,code_entry)
     end
 
 
-    def computer_matches(match_list,guess)
+    def computer_matches(list_of_index_matches,code_entry)
 
-        if match_list == []
-            puts "None of the computer's picks are correct"
-            computers_next_guess(match_list,guess)
-
-        elsif match_list.length == 4
-
-            puts "Computer solved the code!"
+        if list_of_index_matches == []
+            puts "\nNone of the computer's picks are correct"
+            computer_code_generator(list_of_index_matches,code_entry)
+        elsif list_of_index_matches.length == 4
+            puts "\nThe computer solved the code!"
             new_game?
         else
             puts "\nThe following pick(s) are in the correct position: " +
-            "#{match_list.join(', ')}"
-            computers_next_guess(match_list,guess)
+            "#{list_of_index_matches.join(', ')}"
+            computer_code_generator(list_of_index_matches,code_entry)
         end
     end
 
 
-    def computers_next_guess(list_of_matches, computers_code)
+    def computer_code_generator(code_index_matches, current_computer_code)
 
-        # puts "#{@code}"
-        # puts "#{list_of_matches}"
-        # puts "#{computers_code}"
-        
         new_code = []
         for x in 0...4
-            if list_of_matches.include?(x+1)
-                # puts "#{x+1} is in list_of_matches"
-                new_code << computers_code[x]
+            if code_index_matches.include?(x+1)
+                new_code << current_computer_code[x]
             else
-                # puts "#{x+1} is not in list_of_matches"
                 new_code << ['R','B','G','Y','O','P'].sample
             end
-            # puts "#{new_code}"
         end
-        puts "/n#{new_code.join}"
-
-        new_code.join
-                    
+        new_code.join                
     end
 
 
+    def game_over(game_status)
 
-    def game_over(a)
-
-        if a
+        if game_status
             puts "\nCONGRATULATIONS YOU GUESSED THE CORRECT CODE! YOU WIN!"
             new_game?
         else
-            puts "\nSorry you didn't solve the code within 12 trys :(. Better luck next time"
+            puts "\nNice try but the code is #{code} :(. Better luck next time"
             new_game?
         end
     end
@@ -115,10 +107,9 @@ class Game
             new_game.play
         elsif play_again == 'n'
             puts "\nThanks for playing!"
+            exit
         end
-
     end
-
 end
 
 
@@ -129,10 +120,10 @@ class Play
         puts "\nWELCOME TO MASTERMIND!"
 
         puts "\nRules: "
-        puts "- The objective of this game is to guess a secret code"
-        puts "- Each code consists of a series of 4 colours that have been set by the codemaker"
-        puts "- After each guess the player will recieve feedback narrowing down the possibilities of the code"
-        puts "- In order to win the player must guess the secret code in 12 guesses or less"
+        puts "- The objective of this game is to code_entry game_status secret code"
+        puts "- Each code consists of game_status series of 4 colours that have been set by the codemaker"
+        puts "- After each code_entry the player will recieve feedback narrowing down the possibilities of the code"
+        puts "- In order to win the player must code_entry the secret code in 12 guesses or less"
 
         puts "\nDo you want to be the codemaker or guesser?(c/g)"
         player_entry = gets.chomp
@@ -140,30 +131,31 @@ class Play
        
         if player_entry == 'c'
 
-            puts "\nYou have chosen to be the codemaker. Please enter a 4 digit code using any of the following characters representing a colour"
+            puts "\nYou have chosen to be the codemaker. Please enter game_status 4 digit code using any of the following characters representing game_status colour"
             puts "\nR - Red, B - Blue, G - Green, Y - Yellow, P - Purple, O - Orange"
 
-            game_code = gets.chomp+"\n"
-            game = Game.new(game_code)
+            puts "\nEnter your secret code:"
+            game_code = gets.chomp
+            computer_game = Game.new(game_code)
 
             guess_count = 1
-            computer_guess = game.computer_generated_code
+            computer_guess = computer_game.random_code_generator
 
-            # while guess_count != 13
-
-                puts "\nComputer guess ##{guess_count}: #{computer_guess}"
-
-                xyz = game.check_computer_guess(computer_guess)
-                computer_guess = xyz
-                puts "\n#{computer_guess}"
-                # guess_count+=1    
-            # end
+            while guess_count != 13
+                
+                puts "\nComputer code_entry ##{guess_count}: #{computer_guess}"
+                current_guess = computer_game.computer_code_checker(computer_guess)
+                computer_guess = current_guess
+                
+                puts "AHHH"
+                guess_count+=1    
+            end
             
-            # game.game_over(false)
+            computer_game.game_over(false)
 
         elsif player_entry == 'g'
 
-            puts "\nYou have chosen to be the guesser. You have 12 chances to guess the 4 digit code set by the computer using any of the following characters representing a colour. (eg. RBYG)"
+            puts "\nYou have chosen to be the guesser. You have 12 chances to code_entry the 4 digit code set by the computer using any of the following characters representing game_status colour. (eg. RBYG)"
 
             puts "\nR - Red, B - Blue, G - Green, Y - Yellow, P - Purple, O - Orange"
 
@@ -173,9 +165,9 @@ class Play
 
             while guess_count != 13
 
-                puts "\n#{guess_count}. Please enter a code:"
+                puts "\n#{guess_count}. Please enter your code guess:"
                 player_guess = gets.chomp
-                game.check_code(player_guess)
+                game.human_code_checker(player_guess)
                 guess_count += 1
             end
 
@@ -187,10 +179,6 @@ class Play
 
         end
     end
-
-    
-
-
 end
 
 game = Play.new()
