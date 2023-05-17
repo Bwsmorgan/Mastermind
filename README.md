@@ -1,5 +1,5 @@
 # Mastermind
-A game of skill and logic in which one player must solve a secret code!
+Description: A game of skill and logic in which one player must solve a secret code!
 
 This project was inspired by The Odin Project: Full Stack Ruby on Rails curriculum. 
 
